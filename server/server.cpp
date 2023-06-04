@@ -3,40 +3,51 @@
 #include <WinSock2.h>
 #pragma comment(lib, "WS2_32.lib")
 
-using namespace std;
 
 int main()
 {
-    WSADATA WSAData;
+	WSADATA WSAData;
 
-    SOCKET serverSock, clientSock;
+	SOCKET serverSock, clientSock;
 
-    SOCKADDR_IN serverAddr, clientAddr;
+	SOCKADDR_IN serverAddr, clientAddr;
 
-    WSAStartup(MAKEWORD(2,0), &WSAData);
-    serverSock = socket(AF_INET, SOCK_STREAM, 0);
+	WSAStartup(MAKEWORD(2, 0), &WSAData);
+	serverSock = socket(AF_INET, SOCK_STREAM, 0);
 
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(5555);
+	serverAddr.sin_addr.s_addr = INADDR_ANY;
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_port = htons(5555);
 
-    bind(serverSock, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
-    listen(serverSock, 0);
+	bind(serverSock, (SOCKADDR*)&serverAddr, sizeof(serverAddr));
+	listen(serverSock, 0);
 
-    cout << "Listening for incoming connections..." << endl;
 
-    char buffer[1024];
-    int clientAddrSize = sizeof(clientAddr);
-    if((clientSock = accept(serverSock, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
-    {
-        cout << "Client connected!" << endl;
-        recv(clientSock, buffer, sizeof(buffer), 0);
-        cout << "Client says: " << buffer << endl;
-        memset(buffer, 0, sizeof(buffer));
+	std::cout << "Listening for incoming connections..." << std::endl;
 
-        closesocket(clientSock);
-        cout << "Client disconnected." << endl;
-    }
-    WSACleanup();
-    closesocket(serverSock);
+	char buffer[1024];
+	int clientAddrSize = sizeof(clientAddr);
+	if ((clientSock = accept(serverSock, (SOCKADDR*)&clientAddr, &clientAddrSize)) == INVALID_SOCKET)
+	{
+		closesocket(clientSock);
+		WSACleanup();
+		closesocket(serverSock);
+		using namespace std;
+		using namespace std;
+		cout << "Invalid Socket." << endl;
+	}
+	std::cout << "Client connected!" << std::endl;
+	std::string text;
+	text.reserve(1024);
+	while (1) {
+		recv(clientSock, const_cast<char*>(text.c_str()), text.size(), 0);
+		std::cout << "Client says: " << text << "\n:>";
+		std::cin >> text;
+		send(clientSock, text.c_str(), text.size(), 0);
+	}
+
+	closesocket(clientSock);
+	std::cout << "Client disconnected." << std::endl;
+	WSACleanup();
+	closesocket(serverSock);
 }
