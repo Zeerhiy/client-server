@@ -32,9 +32,7 @@ int main()
 		closesocket(clientSock);
 		WSACleanup();
 		closesocket(serverSock);
-		using namespace std;
-		using namespace std;
-		cout << "Invalid Socket." << endl;
+		std::cout << "Invalid Socket." << std::endl;
 	}
 	std::cout << "Client connected!" << std::endl;
 	std::string text;
